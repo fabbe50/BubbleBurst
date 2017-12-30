@@ -26,6 +26,9 @@ public class Sprite extends Component {
 	private int textureHeight;
 
 	private float scale = 1.0f;
+	
+	private boolean canMove = true;
+	private boolean canTouch = true;
 
 	/**
 	 * Creates a sprite (animated image) with ResourceLocation sprite.
@@ -63,6 +66,22 @@ public class Sprite extends Component {
 	public void setScale(float scale) {
 		this.scale = scale;
 	}
+	
+	public void setCanMove(boolean canMove) {
+		this.canMove = canMove;
+	}
+	
+	public boolean canMove() {
+		return canMove;
+	}
+	
+	public void setCanTouch(boolean canTouch) {
+		this.canTouch = canTouch;
+	}
+	
+	public boolean canTouch() {
+		return canTouch;
+	}
 
 	/**
 	 * Checks if this sprite is touching another.
@@ -73,10 +92,26 @@ public class Sprite extends Component {
 		int offset = this.textureWidth / 8;
 		if (this.xPosition + offset > sprite.xPosition && this.xPosition - offset < sprite.xPosition) {
 			if (this.yPosition + offset > sprite.yPosition && this.yPosition - offset < sprite.yPosition) {
-				return true;
+				return this.canTouch() && true;
 			}
 		}
 		return false;
+	}
+	
+	public void setTextureWidth(int textureWidth) {
+		this.textureWidth = textureWidth;
+	}
+	
+	public int getTextureWidth() {
+		return textureWidth;
+	}
+	
+	public void setTextureHeight(int textureHeight) {
+		this.textureHeight = textureHeight;
+	}
+	
+	public int getTextureHeight() {
+		return textureHeight;
 	}
 
 	/**

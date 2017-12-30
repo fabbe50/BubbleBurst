@@ -1,7 +1,9 @@
 package coffeecatteam.bubble_burst.program.layouts;
 
 import java.awt.Color;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -26,6 +28,7 @@ public class LayoutGame extends Layout {
 	private Button buttonBack;
 
 	private Label labelVersion;
+	private static long time;
 
 	// Sprites
 	private Sprite cursor;
@@ -44,6 +47,8 @@ public class LayoutGame extends Layout {
 
 	@Override
 	public void init() {
+		this.components.clear();
+		time = new Date().getTime();
 		this.hydrogen_bubbles = new ArrayList<>();
 		this.bombs = new ArrayList<>();
 
@@ -64,7 +69,7 @@ public class LayoutGame extends Layout {
 		int bombAmount = bubblesAmount / 2; // default: 2
 		for (int i = 0; i < bombAmount; i++) {
 			Sprite bomb = new Sprite(this.width / 2, ((this.height / 2) - 4) + randInt(-10, 10),
-					new ResourceLocation(Reference.MODID, "textures/sprites/bomb.png"));
+					new ResourceLocation(Reference.MODID, "textures/sprites/bomb.png"), 64, 32);
 			this.bombs.add(bomb);
 			super.addComponent(this.bombs.get(i));
 		}
@@ -110,6 +115,13 @@ public class LayoutGame extends Layout {
 		int speed = 5; // default: 5
 
 		if (this.application.getCurrentLayout() == this) {
+			// Time
+			long currentTime = new Date().getTime();
+			long newTime = currentTime - time;
+			
+			long minTime = 1000*1;
+			long maxTime = 1000*3;
+			
 			// Hydrogen Bubbles
 			for (Sprite hydrogen_bubble : this.hydrogen_bubbles) {
 
@@ -125,13 +137,15 @@ public class LayoutGame extends Layout {
 
 					Minecraft.getMinecraft().player.playSound(SoundHandler.BUBBLE_POP, 1.0f,
 							(0.5f + new Random().nextFloat()) * 1.5f);
+					
 					respawn(hydrogen_bubble, this.width, this.height);
 				}
 			}
 			// Bombs
 			for (Sprite bomb : this.bombs) {
 
-				bomb.yPosition += speed;
+				if (bomb.canMove())
+					bomb.yPosition += speed;
 				if (bomb.yPosition > this.height * 2) {
 					respawn(bomb, this.width, this.height);
 				}
@@ -145,8 +159,25 @@ public class LayoutGame extends Layout {
 						Minecraft.getMinecraft().player.playSound(SoundHandler.BOMB_1, 0.2f, (0.5f + new Random().nextFloat())*1.5f);
 					else
 						Minecraft.getMinecraft().player.playSound(SoundHandler.BOMB_2, 0.2f, (0.5f + new Random().nextFloat())*1.5f);
-					respawn(bomb, this.width, this.height);
+					
+					bomb.setCanMove(false);
 				}
+				
+				if (!bomb.canMove() && bomb.canTouch()) {
+					if (newTime >= minTime && newTime <= maxTime) {
+						bomb.setSprite(new ResourceLocation(Reference.MODID, "textures/sprites/explosion.png"));
+						bomb.setCanMove(false);
+					} else {
+						bomb.setSprite(new ResourceLocation(Reference.MODID, "textures/sprites/bomb.png"));
+						bomb.setCanMove(true);
+						respawn(bomb, this.width, this.height);
+					}
+				}
+			}
+			// End Time
+			//System.out.println(new SimpleDateFormat("mm:ss:SSS").format(new Date(newTime)) + " | " + newTime + " | " + minTime + " | " + maxTime);
+			if (newTime > maxTime) {
+				time = new Date().getTime();
 			}
 		} else {
 			this.score = this.application.getTopScore();

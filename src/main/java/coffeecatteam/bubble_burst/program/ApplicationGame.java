@@ -2,13 +2,14 @@ package coffeecatteam.bubble_burst.program;
 
 import com.mrcrayfish.device.api.app.Application;
 import com.mrcrayfish.device.api.app.Icons;
+import com.mrcrayfish.device.api.app.Layout;
 import com.mrcrayfish.device.api.app.component.Button;
 import com.mrcrayfish.device.api.app.component.Label;
 
 import coffeecatteam.bubble_burst.Reference;
 import coffeecatteam.bubble_burst.program.component.Sprite;
 import coffeecatteam.bubble_burst.program.layouts.LayoutGame;
-import coffeecatteam.bubble_burst.program.layouts.LayoutInstructions;
+import coffeecatteam.bubble_burst.program.layouts.instructions.LayoutInstructions;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 
@@ -43,9 +44,8 @@ public class ApplicationGame extends Application {
 	}
 
 	public void init() {
-
 		this.layoutGame = new LayoutGame(200, 100, this);
-		this.layoutInstructions = new LayoutInstructions(277, 115, this);
+		this.layoutInstructions = new LayoutInstructions(260, 95, this);
 
 		// Start Menu
 		this.buttonStart = new Button(5, 5, "Start", Icons.PLAY);
@@ -64,12 +64,24 @@ public class ApplicationGame extends Application {
 		});
 		super.addComponent(this.buttonInstructions);
 
-		this.labelVersion = new Label("Version: " + Reference.VERSION, 5, this.getHeight() - 12);
+		this.labelVersion = new Label("Version: " + Reference.VERSION, 5, 53);
 		super.addComponent(this.labelVersion);
 		
 		this.fire_stick = new Sprite(60, 5, new ResourceLocation(Reference.MODID, "textures/sprites/cursor.png"));
 		this.fire_stick.setScale(1.5f);
 		super.addComponent(this.fire_stick);
+	}
+	
+	public LayoutInstructions getLayoutInstructions() {
+		return layoutInstructions;
+	}
+	
+	public void setLayout(Layout layout) {
+		this.setCurrentLayout(layout);
+	}
+	
+	public Layout getLayout() {
+		return this.getCurrentLayout();
 	}
 	
 	@Override
@@ -80,6 +92,7 @@ public class ApplicationGame extends Application {
 	@Override
 	public void onTick() {
 		this.layoutGame.onTick();
+		this.layoutInstructions.onTick();
 		super.onTick();
 	}
 
